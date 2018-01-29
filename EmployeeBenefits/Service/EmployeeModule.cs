@@ -1,5 +1,6 @@
 ﻿using EmployeeBenefits.Commands.Models;
 using EmployeeBenefits.Queries;
+using EmployeeBenefits.Queries.Messages;
 using EmployeeBenefits.Queries.Results;
 using MediatR;
 using Nancy;
@@ -51,52 +52,16 @@ namespace EmployeeBenefits.Service
 
         private Response GetBenefitsSummary(int employeeId)
         {
-            var data = new List<BenefitsSummary>
-            {
-                new BenefitsSummary
-                {
-                    EmployeeName = "sam",
-                    EmployeeSalary = 1000,
-                    EmployeeCost = 1000,
-                    AnnualTotal= 1000,
-                    BiWeeklyTotal = 1000,
-                    Savings = 1,
-                    DiscountAmount = 1,
-                    DependentSummaryList = new List<DependentSummary>
-                    {
-                        new DependentSummary
-                        {
-                            DependentName = "larry",
-                            DependentCost = 500,
-                            DiscountFlag = true,
-                            Relationship = "Son"
-                        }
-                    }
-                }
-            };
+            if (employeeId < 1)
+                return HttpStatusCode.BadRequest;
+
+            var message = new GetBenefitsSummaryMessage { EmployeeId = employeeId };
+
+            var data = _mediator.Send(message).Result;
 
             var returnValue = Response.AsJson(data);
 
             return returnValue;
-        }
-        public class BenefitsSummary
-        {
-            public string EmployeeName { get; set; }
-            public decimal EmployeeSalary { get; set; }
-            public decimal EmployeeCost { get; set; }
-            public decimal AnnualTotal { get; set; }
-            public decimal BiWeeklyTotal { get; set; }
-            public decimal Savings { get; set; }
-            public decimal DiscountAmount { get; set; }
-            public List<DependentSummary> DependentSummaryList { get; set; }
-        }
-
-        public class DependentSummary
-        {
-            public string DependentName { get; set; }
-            public string Relationship { get; set; }
-            public decimal DependentCost { get; set; }
-            public bool DiscountFlag { get; set; }
         }
     }
 }

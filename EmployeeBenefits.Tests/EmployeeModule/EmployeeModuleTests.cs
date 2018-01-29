@@ -10,6 +10,10 @@ using FakeItEasy;
 using FluentAssertions;
 using Nancy;
 using FizzWare.NBuilder;
+using EmployeeBenefits.Queries.Messages;
+using EmployeeBenefits.Queries.Results;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace EmployeeBenefits.Tests.EmployeeModule
 {
@@ -25,29 +29,32 @@ namespace EmployeeBenefits.Tests.EmployeeModule
             mediator = A.Fake<IMediator>();
         }
 
-        protected class BenefitsSummary
+        protected List<GetBenefitsSummaryResults> GetBenefitsSummaryList()
         {
-            protected string EmployeeName { get; set; }
-            protected decimal EmployeeSalary { get; set; }
-            protected decimal EmployeeCost { get; set; }
-            protected decimal AnnualTotal { get; set; }
-            protected decimal BiWeeklyTotal { get; set; }
-            protected decimal Savings { get; set; }
-            protected decimal DiscountAmount { get; set; }
-            protected List<DependentSummary> DependentSummary { get; set; }
-        }
-
-        protected class DependentSummary
-        {
-            protected string DependentName { get; set; }
-            protected string Relationship { get; set; }
-            protected decimal DependentCost { get; set; }
-            protected bool DiscountFlag { get; set; }
-        }
-
-        protected IList<BenefitsSummary> GetBenefitsSummaryList()
-        {
-            return Builder<BenefitsSummary>.CreateListOfSize(1).Build();
+            var data = new List<GetBenefitsSummaryResults>
+            {
+                new GetBenefitsSummaryResults
+                {
+                    EmployeeName = "sam",
+                    EmployeeSalary = 1000,
+                    EmployeeCost = 1000,
+                    AnnualTotal= 1000,
+                    BiWeeklyTotal = 1000,
+                    Savings = 1,
+                    DiscountAmount = 1,
+                    DependentSummaryList = new List<DependentSummary>
+                    {
+                        new DependentSummary
+                        {
+                            DependentName = "larry",
+                            DependentCost = 500,
+                            DiscountFlag = true,
+                            Relationship = "Son"
+                        }
+                    }
+                }
+            };
+            return data;
         }
     }
 
@@ -69,7 +76,7 @@ namespace EmployeeBenefits.Tests.EmployeeModule
         }
 
         [Test]
-        public void ItShouldReturnSummary()
+        public void ItShouldCallGetSummary()
         {
             var browser = new Browser(with =>
             {
@@ -83,15 +90,24 @@ namespace EmployeeBenefits.Tests.EmployeeModule
                 with.Header("Accept", "application/json");
             });
 
-            var result = response.Result.Body.DeserializeJson<BenefitsSummary>();
+            A.CallTo(() => mediator.Send(A<GetBenefitsSummaryMessage>.Ignored, A<CancellationToken>.Ignored)).MustHaveHappened();
         }
     }
-    public class WhenBenefitsSummaryIsCalledWithoutEmployee : EmployeeModuleTests
+
+    public class WhenBenefitsSummaryIsCalledWithoutValidEmployee : EmployeeModuleTests
     {
         [Test]
         public void ItShouldReturnBadRequest()
         {
+            var browser = new Browser(with =>
+            {
+                with.Module<EmployeeBenefits.Service.EmployeeModule>();
+                with.Dependencies(mediator);
+            });
 
+            var response = browser.Get("/benefitssummary/0");
+
+            response.Result.StatusCode.ShouldBeEquivalentTo(HttpStatusCode.BadRequest);
         }
     }
 }
