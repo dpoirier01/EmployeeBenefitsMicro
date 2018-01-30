@@ -10,9 +10,9 @@ namespace EmployeeBenefits.Queries.Handlers
     public class GetBenefitsSummaryHandler : IRequestHandler<GetBenefitsSummaryMessage, List<GetBenefitsSummaryResults>>
     {
 
-        private readonly IEmployeeRepository _db;
+        private readonly IBenefitsSummaryRepository _db;
 
-        public GetBenefitsSummaryHandler(IEmployeeRepository db)
+        public GetBenefitsSummaryHandler(IBenefitsSummaryRepository db)
         {
             _db = db;
         }

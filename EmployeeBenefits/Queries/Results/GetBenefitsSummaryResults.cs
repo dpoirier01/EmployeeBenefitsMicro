@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using EmployeeBenefits.Data;
+using System.Collections.Generic;
 
 namespace EmployeeBenefits.Queries.Results
 {
-    public class GetBenefitsSummaryResults
+    public class GetBenefitsSummaryResults : IEntity
     {
+        public int Id { get; set; }
         public string EmployeeName { get; set; }
         public decimal EmployeeSalary { get; set; }
         public decimal EmployeeCost { get; set; }

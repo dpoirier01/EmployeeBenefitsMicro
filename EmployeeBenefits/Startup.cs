@@ -61,6 +61,7 @@ namespace EmployeeBenefits
             services.AddDbContext<BenefitsContext>();
 
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<IBenefitsSummaryRepository, BenefitsSummaryRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
