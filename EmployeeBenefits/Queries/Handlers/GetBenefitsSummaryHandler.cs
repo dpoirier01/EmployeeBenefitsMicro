@@ -1,4 +1,6 @@
-﻿using EmployeeBenefits.Queries.Messages;
+﻿using EmployeeBenefits.Data;
+using EmployeeBenefits.Data.Repositories;
+using EmployeeBenefits.Queries.Messages;
 using EmployeeBenefits.Queries.Results;
 using MediatR;
 using System.Collections.Generic;
@@ -7,6 +9,14 @@ namespace EmployeeBenefits.Queries.Handlers
 {
     public class GetBenefitsSummaryHandler : IRequestHandler<GetBenefitsSummaryMessage, List<GetBenefitsSummaryResults>>
     {
+
+        private readonly IEmployeeRepository _db;
+
+        public GetBenefitsSummaryHandler(IEmployeeRepository db)
+        {
+            _db = db;
+        }
+
         public List<GetBenefitsSummaryResults> Handle(GetBenefitsSummaryMessage message)
         {
             var data = new List<GetBenefitsSummaryResults>

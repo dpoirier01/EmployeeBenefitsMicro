@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using EmployeeBenefits.Commands.Models;
-using EmployeeBenefits.Data;
+using EmployeeBenefits.Data.Entities;
 
 namespace EmployeeBenefits
 {

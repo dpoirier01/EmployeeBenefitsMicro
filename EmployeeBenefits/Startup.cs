@@ -17,6 +17,7 @@ using Nancy;
 using Nancy.Configuration;
 using Nancy.TinyIoc;
 using EmployeeBenefits.Data;
+using EmployeeBenefits.Data.Repositories;
 
 namespace EmployeeBenefits
 {
@@ -58,6 +59,8 @@ namespace EmployeeBenefits
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
 
             services.AddDbContext<BenefitsContext>();
+
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

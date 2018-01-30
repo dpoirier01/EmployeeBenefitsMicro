@@ -1,4 +1,5 @@
 ﻿using EmployeeBenefits.Commands.Models;
+using EmployeeBenefits.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
