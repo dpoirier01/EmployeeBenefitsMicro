@@ -1,6 +1,8 @@
-﻿namespace EmployeeBenefits.Queries.Results
+﻿using EmployeeBenefits.Data;
+
+namespace EmployeeBenefits.Queries.Results
 {
-    public class GetAllEmployeesResults
+    public class GetAllEmployeesResults 
     {
         public int Id { get; set; }
         public string FirstName { get; set; }

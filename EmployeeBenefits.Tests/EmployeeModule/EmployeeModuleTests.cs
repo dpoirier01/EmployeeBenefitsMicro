@@ -28,34 +28,6 @@ namespace EmployeeBenefits.Tests.EmployeeModule
 
             mediator = A.Fake<IMediator>();
         }
-
-        protected List<GetBenefitsSummaryResults> GetBenefitsSummaryList()
-        {
-            var data = new List<GetBenefitsSummaryResults>
-            {
-                new GetBenefitsSummaryResults
-                {
-                    EmployeeName = "sam",
-                    EmployeeSalary = 1000,
-                    EmployeeCost = 1000,
-                    AnnualTotal= 1000,
-                    BiWeeklyTotal = 1000,
-                    Savings = 1,
-                    DiscountAmount = 1,
-                    DependentSummaryList = new List<DependentSummary>
-                    {
-                        new DependentSummary
-                        {
-                            DependentName = "larry",
-                            DependentCost = 500,
-                            DiscountFlag = true,
-                            Relationship = "Son"
-                        }
-                    }
-                }
-            };
-            return data;
-        }
     }
 
     public class WhenBenefitsSummaryIsCalledWithEmployee : EmployeeModuleTests
@@ -90,7 +62,7 @@ namespace EmployeeBenefits.Tests.EmployeeModule
                 with.Header("Accept", "application/json");
             });
 
-            A.CallTo(() => mediator.Send(A<GetBenefitsSummaryMessage>.Ignored, A<CancellationToken>.Ignored)).MustHaveHappened();
+            A.CallTo(() => mediator.Send(A<GetBenefitsDataMessage>.Ignored, A<CancellationToken>.Ignored)).MustHaveHappened();
         }
     }
 

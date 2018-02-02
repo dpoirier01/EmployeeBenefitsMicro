@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace EmployeeBenefits.Queries.Messages
 {
-    public class GetBenefitsSummaryMessage : IRequest<List<GetBenefitsSummaryResults>>
+    public class GetBenefitsDataMessage : IRequest<GetBenefitsDataResults>
     {
         public int EmployeeId { get; set; }
     }

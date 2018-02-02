@@ -17,7 +17,7 @@ using Nancy;
 using Nancy.Configuration;
 using Nancy.TinyIoc;
 using EmployeeBenefits.Data;
-using EmployeeBenefits.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeBenefits
 {
@@ -37,6 +37,9 @@ namespace EmployeeBenefits
 
             _config = builder.Build();
         }
+
+        public IConfiguration Configuration { get; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -59,9 +62,7 @@ namespace EmployeeBenefits
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
 
             services.AddDbContext<BenefitsContext>();
-
-            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-            services.AddScoped<IBenefitsSummaryRepository, BenefitsSummaryRepository>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

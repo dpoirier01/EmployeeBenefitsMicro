@@ -14,13 +14,21 @@ namespace EmployeeBenefits.Data
             _config = config;
         }
 
+        public BenefitsContext(DbContextOptions<BenefitsContext> options) : base(options)
+        { }
+
         public DbSet<Employee> Employee { get; set; }
+        public DbSet<Dependent> Dependent { get; set; }
+        public DbSet<Benefit> Benefit { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
 
-            optionsBuilder.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+            }
         }
     }
 }

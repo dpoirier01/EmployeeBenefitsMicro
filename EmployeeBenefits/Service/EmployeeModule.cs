@@ -55,7 +55,7 @@ namespace EmployeeBenefits.Service
             if (employeeId < 1)
                 return HttpStatusCode.BadRequest;
 
-            var message = new GetBenefitsSummaryMessage { EmployeeId = employeeId };
+            var message = new GetBenefitsDataMessage { EmployeeId = employeeId };
 
             var data = _mediator.Send(message).Result;
 
