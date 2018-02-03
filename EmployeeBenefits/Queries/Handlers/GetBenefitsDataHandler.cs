@@ -23,6 +23,7 @@ namespace EmployeeBenefits.Queries.Handlers
             data.Employee = GetEmployee(message.EmployeeId).FirstOrDefault();
             data.Dependent = GetDependent(message.EmployeeId).ToList();
             data.Benefit = GetBenefit().FirstOrDefault();
+            data.Promotions = GetPromotions().ToList();
 
             return data;
         }
@@ -44,7 +45,7 @@ namespace EmployeeBenefits.Queries.Handlers
 
         private IQueryable<Dependent> GetDependent(int employeeId)
         {
-            var dependent = (from d in _db.Dependent
+            var dependents = (from d in _db.Dependent
                              where d.EmployeeId == employeeId
                              select new Dependent
                              {
@@ -54,7 +55,7 @@ namespace EmployeeBenefits.Queries.Handlers
                                  EmployeeId = d.EmployeeId,
                                  Relationship = d.Relationship 
                              });
-            return dependent;
+            return dependents;
         }
 
         private IQueryable<Benefit> GetBenefit()
@@ -66,6 +67,19 @@ namespace EmployeeBenefits.Queries.Handlers
                                DependentCost = b.DependentCost 
                            });
             return benefit;
+        }
+
+        private IQueryable<Promotions> GetPromotions()
+        {
+            var promotions = (from p in _db.Promotions
+                             select new Promotions
+                             {
+                                 Id = p.Id,
+                                 PromotionName = p.PromotionName,
+                                 PromotionTrigger = p.PromotionTrigger,
+                                 DiscountAmount = p.DiscountAmount
+                             });
+            return promotions;
         }
     }
 }

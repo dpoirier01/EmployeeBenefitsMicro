@@ -4,16 +4,15 @@ using NUnit.Framework;
 using EmployeeBenefits;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using MediatR;
 using FakeItEasy;
 using FluentAssertions;
 using Nancy;
-using FizzWare.NBuilder;
 using EmployeeBenefits.Queries.Messages;
 using EmployeeBenefits.Queries.Results;
 using System.Threading.Tasks;
 using System.Threading;
+using EmployeeBenefits.Business;
 
 namespace EmployeeBenefits.Tests.EmployeeModule
 {
@@ -21,64 +20,66 @@ namespace EmployeeBenefits.Tests.EmployeeModule
     public class EmployeeModuleTests : ContextSpecification
     {
         protected IMediator mediator;
+        protected ISummarizeBenefits summarizeBenefits;
+        protected Browser browser;
+        protected Task<BrowserResponse> response;
 
         protected override void Context()
         {
             base.Context();
 
             mediator = A.Fake<IMediator>();
+            summarizeBenefits = A.Fake<ISummarizeBenefits>();
+
+            browser = new Browser(with =>
+            {
+                with.Module<EmployeeBenefits.Service.EmployeeModule>();
+                with.Dependencies(mediator);
+                with.Dependencies(summarizeBenefits);
+            });
         }
     }
 
     public class WhenBenefitsSummaryIsCalledWithEmployee : EmployeeModuleTests
     {
-
-        [Test]
-        public void ItShouldReturnOkay()
+        protected override void BecauseOf()
         {
-            var browser = new Browser(with =>
-            {
-                with.Module<EmployeeBenefits.Service.EmployeeModule>();
-                with.Dependencies(mediator);
-            });
-
-            var response = browser.Get("/benefitssummary/2");
-
-            response.Result.StatusCode.ShouldBeEquivalentTo(HttpStatusCode.OK);
-        }
-
-        [Test]
-        public void ItShouldCallGetSummary()
-        {
-            var browser = new Browser(with =>
-            {
-                with.Module<EmployeeBenefits.Service.EmployeeModule>();
-                with.Dependencies(mediator);
-            });
-
-            var response = browser.Get("/benefitssummary/2", with =>
+            response = browser.Get("/benefitssummary/2", with =>
             {
                 with.HttpRequest();
                 with.Header("Accept", "application/json");
             });
+        }
 
+        [Test]
+        public void ItShouldReturnOkay()
+        {
+            response.Result.StatusCode.ShouldBeEquivalentTo(HttpStatusCode.OK);
+        }
+
+        [Test]
+        public void ItShouldCallGetBenefitsData()
+        {
             A.CallTo(() => mediator.Send(A<GetBenefitsDataMessage>.Ignored, A<CancellationToken>.Ignored)).MustHaveHappened();
+        }
+
+        [Test]
+        public void ItShouldCallGetBenefitsSummary()
+        {
+            A.CallTo(() => summarizeBenefits.Run(A<GetBenefitsDataResults>.Ignored)).MustHaveHappened();
         }
     }
 
     public class WhenBenefitsSummaryIsCalledWithoutValidEmployee : EmployeeModuleTests
     {
+        protected override void BecauseOf()
+        {
+            response = browser.Get("/benefitssummary/0");
+        }
+
         [Test]
         public void ItShouldReturnBadRequest()
         {
-            var browser = new Browser(with =>
-            {
-                with.Module<EmployeeBenefits.Service.EmployeeModule>();
-                with.Dependencies(mediator);
-            });
-
-            var response = browser.Get("/benefitssummary/0");
-
             response.Result.StatusCode.ShouldBeEquivalentTo(HttpStatusCode.BadRequest);
         }
     }

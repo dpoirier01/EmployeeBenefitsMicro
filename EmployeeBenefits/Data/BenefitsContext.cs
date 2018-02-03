@@ -20,6 +20,7 @@ namespace EmployeeBenefits.Data
         public DbSet<Employee> Employee { get; set; }
         public DbSet<Dependent> Dependent { get; set; }
         public DbSet<Benefit> Benefit { get; set; }
+        public DbSet<Promotions> Promotions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

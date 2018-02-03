@@ -1,4 +1,5 @@
-﻿using EmployeeBenefits.Commands.Models;
+﻿using EmployeeBenefits.Business;
+using EmployeeBenefits.Commands.Models;
 using EmployeeBenefits.Queries;
 using EmployeeBenefits.Queries.Messages;
 using EmployeeBenefits.Queries.Results;
@@ -12,10 +13,12 @@ namespace EmployeeBenefits.Service
     public class EmployeeModule : NancyModule
     {
         private readonly IMediator _mediator;
+        private readonly ISummarizeBenefits _summarizeBenefits;
 
-        public EmployeeModule(IMediator mediator)
+        public EmployeeModule(IMediator mediator, ISummarizeBenefits summarizeBenefits)
         {
             _mediator = mediator;
+            _summarizeBenefits = summarizeBenefits;
             
             Post("/enroll", args =>
             {
@@ -55,11 +58,12 @@ namespace EmployeeBenefits.Service
             if (employeeId < 1)
                 return HttpStatusCode.BadRequest;
 
-            var message = new GetBenefitsDataMessage { EmployeeId = employeeId };
+            var dataMessage = new GetBenefitsDataMessage { EmployeeId = employeeId };
+            var data = _mediator.Send(dataMessage).Result;
+            
+            var summary = _summarizeBenefits.Run(data);
 
-            var data = _mediator.Send(message).Result;
-
-            var returnValue = Response.AsJson(data);
+            var returnValue = Response.AsJson(summary);
 
             return returnValue;
         }

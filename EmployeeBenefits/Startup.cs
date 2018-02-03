@@ -18,6 +18,7 @@ using Nancy.Configuration;
 using Nancy.TinyIoc;
 using EmployeeBenefits.Data;
 using Microsoft.EntityFrameworkCore;
+using EmployeeBenefits.Business;
 
 namespace EmployeeBenefits
 {
@@ -101,6 +102,7 @@ namespace EmployeeBenefits
             container.Register(_serviceProvider.GetService<ILoggerFactory>());
             container.Register(_serviceProvider.GetService<IMediator>());
             container.Register(_serviceProvider.GetService<IMapper>());
+            container.Register(_serviceProvider.GetService<ISummarizeBenefits>());
         }
     }
 
