@@ -6,6 +6,7 @@ using EmployeeBenefits.Data;
 using FakeItEasy;
 using EmployeeBenefits.Business;
 using System.Linq;
+using EmployeeBenefits.Framework.Tasks;
 
 namespace EmployeeBenefits.Tests.Business
 {
@@ -14,12 +15,15 @@ namespace EmployeeBenefits.Tests.Business
     {
         protected SummarizeBenefits sut;
         protected BenefitsSummary results;
+        protected IProcess<BenefitsSummary> process;
 
         protected override void Context()
         {
             base.Context();
 
-            sut = new SummarizeBenefits();
+            process = A.Fake<IProcess<BenefitsSummary>>();
+
+            sut = new SummarizeBenefits(process);
         }
 
         protected override BenefitsContext BenefitsDatabase()

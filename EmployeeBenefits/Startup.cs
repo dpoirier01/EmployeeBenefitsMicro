@@ -19,6 +19,8 @@ using Nancy.TinyIoc;
 using EmployeeBenefits.Data;
 using Microsoft.EntityFrameworkCore;
 using EmployeeBenefits.Business;
+using EmployeeBenefits.Framework.Tasks;
+using Microsoft.Data.Sqlite;
 
 namespace EmployeeBenefits
 {
@@ -62,8 +64,10 @@ namespace EmployeeBenefits
 
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
 
-            services.AddDbContext<BenefitsContext>();
-            
+            //services.AddDbContext<BenefitsContext>();
+            services.AddDbContext<BenefitsContext>(options =>
+               options.UseSqlServer(@"ConnectionStrings:DefaultConnection"));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -103,6 +107,16 @@ namespace EmployeeBenefits
             container.Register(_serviceProvider.GetService<IMediator>());
             container.Register(_serviceProvider.GetService<IMapper>());
             container.Register(_serviceProvider.GetService<ISummarizeBenefits>());
+            container.Register(_serviceProvider.GetService<IProcess<BenefitsSummary>>());
+            container.Register(_serviceProvider.GetService<ITaskFactory>());
+            container.Register(_serviceProvider.GetService<BenefitsSummary>());
+
+            //container.Register(_serviceProvider.GetService<IConfigurationRoot>());
+            //container.Register(_serviceProvider.GetService<DbContextOptions<BenefitsContext>>());
+            //container.Register(_serviceProvider.GetService<DbContextOptions>());
+            //container.Register(_serviceProvider.GetService<DbContextOptionsBuilder>());
+            //container.Register(_serviceProvider.GetService<DbContextOptionsBuilder<BenefitsContext>>());
+            
         }
     }
 
