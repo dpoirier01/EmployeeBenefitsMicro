@@ -19,7 +19,6 @@ using Nancy.TinyIoc;
 using EmployeeBenefits.Data;
 using Microsoft.EntityFrameworkCore;
 using EmployeeBenefits.Business;
-using EmployeeBenefits.Framework.Tasks;
 using Microsoft.Data.Sqlite;
 
 namespace EmployeeBenefits
@@ -54,20 +53,14 @@ namespace EmployeeBenefits
             services.AddSingleton(_config);
 
             services.AddAutoMapper();
-
-            //services.AddScoped<IMediator, Mediator>();
-            //services.AddTransient<SingleInstanceFactory>(sp => t => sp.GetService(t));
-            //services.AddTransient<MultiInstanceFactory>(sp => t => sp.GetServices(t));
-            //services.AddMediatorHandlers(typeof(Startup).GetTypeInfo().Assembly);
-
+            
             services.AddTransient<IMediator, Mediator>();
 
             services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
 
-            //services.AddDbContext<BenefitsContext>();
-            services.AddDbContext<BenefitsContext>(options =>
-               options.UseSqlServer(@"ConnectionStrings:DefaultConnection"));
+            services.AddDbContext<BenefitsContext>();
 
+            services.AddScoped<IBenefitsContext>(provider => provider.GetService<BenefitsContext>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -106,42 +99,19 @@ namespace EmployeeBenefits
             container.Register(_serviceProvider.GetService<ILoggerFactory>());
             container.Register(_serviceProvider.GetService<IMediator>());
             container.Register(_serviceProvider.GetService<IMapper>());
-            container.Register(_serviceProvider.GetService<ISummarizeBenefits>());
-            container.Register(_serviceProvider.GetService<IProcess<BenefitsSummary>>());
-            container.Register(_serviceProvider.GetService<ITaskFactory>());
+            //container.Register(_serviceProvider.GetService<ISummarizeBenefits>());
+            //container.Register(_serviceProvider.GetService<IProcess<BenefitsSummary>>());
+            //container.Resolve<ITaskFactory>();
+            //container.Register(_serviceProvider.GetService<ITaskFactory>());
             container.Register(_serviceProvider.GetService<BenefitsSummary>());
+           
+        }
 
-            //container.Register(_serviceProvider.GetService<IConfigurationRoot>());
-            //container.Register(_serviceProvider.GetService<DbContextOptions<BenefitsContext>>());
-            //container.Register(_serviceProvider.GetService<DbContextOptions>());
-            //container.Register(_serviceProvider.GetService<DbContextOptionsBuilder>());
-            //container.Register(_serviceProvider.GetService<DbContextOptionsBuilder<BenefitsContext>>());
+        protected override void ConfigureRequestContainer(TinyIoCContainer container, NancyContext context)
+        {
+            base.ConfigureRequestContainer(container, context);
             
+            container.Register(typeof(ISummarizeBenefits), typeof(SummarizeBenefits));
         }
     }
-
-    //public static class MediatorExtensions
-    //{
-    //    public static IServiceCollection AddMediatorHandlers(this IServiceCollection services, Assembly assembly)
-    //    {
-    //        var classTypes = assembly.ExportedTypes.Select(t => t.GetTypeInfo()).Where(t => t.IsClass && !t.IsAbstract);
-
-    //        foreach (var type in classTypes)
-    //        {
-    //            var interfaces = type.ImplementedInterfaces.Select(i => i.GetTypeInfo());
-
-    //            foreach (var handlerType in interfaces.Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)))
-    //            {
-    //                services.AddTransient(handlerType.AsType(), type.AsType());
-    //            }
-
-    //            foreach (var handlerType in interfaces.Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAsyncRequestHandler<,>)))
-    //            {
-    //                services.AddTransient(handlerType.AsType(), type.AsType());
-    //            }
-    //        }
-
-    //        return services;
-    //    }
-    //}
 }

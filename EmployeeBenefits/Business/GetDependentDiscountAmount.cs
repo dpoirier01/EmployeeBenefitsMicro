@@ -1,9 +1,8 @@
-﻿using EmployeeBenefits.Framework.Tasks;
-using System.Linq;
+﻿using System.Linq;
 
 namespace EmployeeBenefits.Business
 {
-    public class GetDependentDiscountAmount : ITask
+    public class GetDependentDiscountAmount
     {
         private readonly BenefitsSummary _context;
 

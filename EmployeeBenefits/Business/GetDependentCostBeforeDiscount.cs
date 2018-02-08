@@ -1,9 +1,8 @@
 ﻿using EmployeeBenefits.Data.Entities;
-using EmployeeBenefits.Framework.Tasks;
 
 namespace EmployeeBenefits.Business
 {
-    public class GetDependentCostBeforeDiscount : ITask
+    public class GetDependentCostBeforeDiscount 
     {
 
         private readonly BenefitsSummary _context;

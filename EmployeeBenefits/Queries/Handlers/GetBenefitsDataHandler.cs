@@ -10,9 +10,9 @@ namespace EmployeeBenefits.Queries.Handlers
     public class GetBenefitsDataHandler : IRequestHandler<GetBenefitsDataMessage, GetBenefitsDataResults>
     {
 
-        private readonly BenefitsContext _db;
+        private readonly IBenefitsContext _db;
 
-        public GetBenefitsDataHandler(BenefitsContext db)
+        public GetBenefitsDataHandler(IBenefitsContext db)
         {
             _db = db;
         }

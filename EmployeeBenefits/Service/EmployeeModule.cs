@@ -58,12 +58,12 @@ namespace EmployeeBenefits.Service
             if (employeeId < 1)
                 return HttpStatusCode.BadRequest;
 
-            var dataMessage = new GetBenefitsDataMessage { EmployeeId = employeeId };
+            var dataMessage = new GetBenefitsDataSummary { EmployeeId = employeeId };
             var data = _mediator.Send(dataMessage).Result;
             
-            var summary = _summarizeBenefits.Run(data);
+            //var summary = _summarizeBenefits.Run(data);
 
-            var returnValue = Response.AsJson(summary);
+            var returnValue = Response.AsJson(data);
 
             return returnValue;
         }

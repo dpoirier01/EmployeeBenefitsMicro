@@ -1,9 +1,9 @@
-﻿using EmployeeBenefits.Queries.Results;
+﻿using EmployeeBenefits.Business;
 using MediatR;
 
 namespace EmployeeBenefits.Queries.Messages
 {
-    public class GetBenefitsDataMessage : IRequest<GetBenefitsDataResults>
+    public class GetBenefitsDataSummary : IRequest<BenefitsSummary>
     {
         public int EmployeeId { get; set; }
     }

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace EmployeeBenefits.Data
 {
-    public class BenefitsContext : Microsoft.EntityFrameworkCore.DbContext
+    public class BenefitsContext : Microsoft.EntityFrameworkCore.DbContext, IBenefitsContext
     {
         private IConfigurationRoot _config;
 
@@ -14,22 +14,22 @@ namespace EmployeeBenefits.Data
             _config = config;
         }
 
-        public BenefitsContext(DbContextOptions<BenefitsContext> options) : base(options)
-        { }
+        //public BenefitsContext(DbContextOptions<BenefitsContext> options) : base(options)
+        //{ }
 
-        public DbSet<Employee> Employee { get; set; }
-        public DbSet<Dependent> Dependent { get; set; }
-        public DbSet<Benefit> Benefit { get; set; }
-        public DbSet<Promotions> Promotions { get; set; }
+        public virtual DbSet<Employee> Employee { get; set; }
+        public virtual DbSet<Dependent> Dependent { get; set; }
+        public virtual DbSet<Benefit> Benefit { get; set; }
+        public virtual DbSet<Promotions> Promotions { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
 
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
-            }
+            //if (!optionsBuilder.IsConfigured)
+            //{
+            optionsBuilder.UseSqlServer(_config["ConnectionStrings:DefaultConnection"]);
+            //}
         }
     }
 }

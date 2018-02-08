@@ -6,7 +6,8 @@ using EmployeeBenefits.Data;
 using FakeItEasy;
 using EmployeeBenefits.Business;
 using System.Linq;
-using EmployeeBenefits.Framework.Tasks;
+using EmployeeBenefits.Data.Entities;
+using System.Collections.Generic;
 
 namespace EmployeeBenefits.Tests.Business
 {
@@ -15,44 +16,44 @@ namespace EmployeeBenefits.Tests.Business
     {
         protected SummarizeBenefits sut;
         protected BenefitsSummary results;
-        protected IProcess<BenefitsSummary> process;
 
         protected override void Context()
         {
             base.Context();
+            
 
-            process = A.Fake<IProcess<BenefitsSummary>>();
-
-            sut = new SummarizeBenefits(process);
-        }
-
-        protected override BenefitsContext BenefitsDatabase()
-        {
-            return base.BenefitsDatabase();
+            sut = new SummarizeBenefits();
         }
 
         protected GetBenefitsDataResults GetBenefitsDataWithEmployeeDiscount()
         {
-            var data = this.BenefitsDatabase();
-
             var benefitsData = new GetBenefitsDataResults();
-            benefitsData.Employee = data.Employee.Where(x => x.Id == 2).FirstOrDefault();
-            benefitsData.Dependent = data.Dependent.Where(x => x.EmployeeId == 2).ToList();
-            benefitsData.Benefit = data.Benefit.FirstOrDefault();
-            benefitsData.Promotions = data.Promotions.ToList();
+            
+            benefitsData.Employee = new Employee { Id = 2, FirstName = "David", LastName = "Arnison", NumberOfPayPeriods = 52, Salary = 100000 };
+            benefitsData.Dependent = new List<Dependent>
+            {
+                new Dependent { Id = 1, FirstName = "John", LastName = "Arnison", Relationship = "Son", EmployeeId = 2 },
+                new Dependent { Id = 2, FirstName = "Jamie", LastName = "Arnison", Relationship = "Daughter", EmployeeId = 2 },
+                new Dependent { Id = 2, FirstName = "Jamie", LastName = "Taylor", Relationship = "Daughter", EmployeeId = 2 }
+            };
+            benefitsData.Benefit = new Benefit { Id = 1, EmployeeCost = 1000, DependentCost = 500 };
+            benefitsData.Promotions = new List<Promotions> { new Promotions { Id = 1, PromotionName = "Name", PromotionTrigger = "A", DiscountAmount = 0.1M } };
 
             return benefitsData;
         }
 
         protected GetBenefitsDataResults GetBenefitsDataWithoutEmployeeDiscount()
         {
-            var data = this.BenefitsDatabase();
-
             var benefitsData = new GetBenefitsDataResults();
-            benefitsData.Employee = data.Employee.Where(x => x.Id == 3).FirstOrDefault();
-            benefitsData.Dependent = data.Dependent.Where(x => x.EmployeeId == 3).ToList();
-            benefitsData.Benefit = data.Benefit.FirstOrDefault();
-            benefitsData.Promotions = data.Promotions.ToList();
+            
+            benefitsData.Employee = new Employee { Id = 3, FirstName = "David", LastName = "Taylor", NumberOfPayPeriods = 52, Salary = 92000 };
+            benefitsData.Dependent = new List<Dependent>
+            {
+                new Dependent { Id = 2, FirstName = "Jamie", LastName = "Taylor", Relationship = "Daughter", EmployeeId = 2 },
+                new Dependent { Id = 2, FirstName = "Jamie", LastName = "Taylor", Relationship = "Daughter", EmployeeId = 2 }
+            };
+            benefitsData.Benefit = new Benefit { Id = 1, EmployeeCost = 1000, DependentCost = 500 };
+            benefitsData.Promotions = new List<Promotions> { new Promotions { Id = 1, PromotionName = "Name", PromotionTrigger = "A", DiscountAmount = 0.1M } };
 
             return benefitsData;
         }
