@@ -8,23 +8,27 @@ using System.Threading.Tasks;
 
 namespace EmployeeBenefits.Queries.Handlers
 {
-    public class GetBenefitsSummaryHandler : IRequestHandler<GetBenefitsDataSummary, BenefitsSummary>
+    public class GetBenefitsSummaryHandler : IRequestHandler<GetBenefitsSummary, BenefitsSummary>
     {
         private readonly IMediator _mediator;
+        private readonly ISummarizeBenefits _summarizeBenefits;
 
-        public GetBenefitsSummaryHandler(IMediator mediator)
+        public GetBenefitsSummaryHandler(IMediator mediator, ISummarizeBenefits summarizeBenefits)
         {
             _mediator = mediator;
+            _summarizeBenefits = summarizeBenefits;
         }
 
-        public BenefitsSummary Handle(GetBenefitsDataSummary message)
+        public BenefitsSummary Handle(GetBenefitsSummary message)
         {
             var msg = new GetBenefitsDataMessage
             {
                 EmployeeId = message.EmployeeId
             };
 
-            var results = _mediator.Send(msg);
+            var data = _mediator.Send(msg).Result;
+
+            var summary = _summarizeBenefits.Run(data);
 
             return new BenefitsSummary();
         }

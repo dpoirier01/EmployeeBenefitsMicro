@@ -60,7 +60,7 @@ namespace EmployeeBenefits.Tests.EmployeeModule
         [Test]
         public void ItShouldCallGetBenefitsData()
         {
-            A.CallTo(() => mediator.Send(A<GetBenefitsDataSummary>.Ignored, A<CancellationToken>.Ignored)).MustHaveHappened();
+            A.CallTo(() => mediator.Send(A<GetBenefitsSummary>.Ignored, A<CancellationToken>.Ignored)).MustHaveHappened();
         }
     }
 

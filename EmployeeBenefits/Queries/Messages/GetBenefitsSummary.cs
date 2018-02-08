@@ -3,7 +3,7 @@ using MediatR;
 
 namespace EmployeeBenefits.Queries.Messages
 {
-    public class GetBenefitsDataSummary : IRequest<BenefitsSummary>
+    public class GetBenefitsSummary : IRequest<BenefitsSummary>
     {
         public int EmployeeId { get; set; }
     }

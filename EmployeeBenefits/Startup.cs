@@ -61,6 +61,8 @@ namespace EmployeeBenefits
             services.AddDbContext<BenefitsContext>();
 
             services.AddScoped<IBenefitsContext>(provider => provider.GetService<BenefitsContext>());
+            
+            services.AddTransient<ISummarizeBenefits, SummarizeBenefits>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -103,7 +105,7 @@ namespace EmployeeBenefits
             //container.Register(_serviceProvider.GetService<IProcess<BenefitsSummary>>());
             //container.Resolve<ITaskFactory>();
             //container.Register(_serviceProvider.GetService<ITaskFactory>());
-            container.Register(_serviceProvider.GetService<BenefitsSummary>());
+            //container.Register(_serviceProvider.GetService<BenefitsSummary>());
            
         }
 

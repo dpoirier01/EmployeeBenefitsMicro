@@ -21,18 +21,20 @@ namespace EmployeeBenefits.Tests.Queries.Handlers
     {
         protected GetBenefitsSummaryHandler sut;
         protected BenefitsSummary results;
-        protected GetBenefitsDataSummary message;
+        protected GetBenefitsSummary message;
         protected IMediator mediator;
+        protected ISummarizeBenefits summarizeBenefits;
 
         protected override void Context()
         {
             base.Context();
 
             mediator = A.Fake<IMediator>();
+            summarizeBenefits = A.Fake<ISummarizeBenefits>();
 
-            A.CallTo(() => mediator.Send(A<GetBenefitsDataSummary>.Ignored, A<CancellationToken>.Ignored)).Returns(GetBenefitsSummary());
+            A.CallTo(() => mediator.Send(A<GetBenefitsSummary>.Ignored, A<CancellationToken>.Ignored)).Returns(GetBenefitsSummary());
 
-            sut = new GetBenefitsSummaryHandler(mediator);
+            sut = new GetBenefitsSummaryHandler(mediator, summarizeBenefits);
         }
 
         protected BenefitsSummary GetBenefitsSummary()
@@ -44,7 +46,7 @@ namespace EmployeeBenefits.Tests.Queries.Handlers
 
         protected override void BecauseOf()
         {
-            message = new GetBenefitsDataSummary { EmployeeId = 2 };
+            message = new GetBenefitsSummary { EmployeeId = 2 };
 
             results = sut.Handle(message);
         }
