@@ -1,5 +1,6 @@
 ﻿using EmployeeBenefits.Data.Entities;
 using EmployeeBenefits.Queries.Results;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace EmployeeBenefits.Business
@@ -13,18 +14,30 @@ namespace EmployeeBenefits.Business
                 EmployeeFirstName = data.Employee.FirstName,
                 EmployeeLastName = data.Employee.LastName,
                 EmployeeCostOfBenefits = data.Benefit.EmployeeCost,
-                DiscountTrigger = data.Promotions.Select(x => x.PromotionTrigger).FirstOrDefault(),
-                DiscountAmount = data.Promotions.Select(x => x.DiscountAmount).FirstOrDefault(),
                 DependentsList = data.Dependent,
+                PromotionsList = data.Promotions,
                 DependentCostOfBenefits = data.Benefit.DependentCost,
                 EmployeeFullName = data.Employee.FirstName + " " + data.Employee.LastName
             };
 
+            if (data.Promotions != null)
+                results.DiscountTrigger = data.Promotions.Select(x => x.PromotionTrigger).FirstOrDefault();
+
+            if (data.Promotions != null)
+                results.DiscountAmount = data.Promotions.Select(x => x.DiscountAmount).FirstOrDefault();
+
             results.EmployeeFullName = GetEmployeeFullName(data);
             results.DependentCostBeforeDiscount = GetDependentCostBeforeDiscount(data);
             results.TotalCostBeforeDiscount = GetTotalBeforeDiscount(results);
-            results.EmployeeDiscountAmount = GetEmployeeDiscountAmount(results);
-            results.DependentDiscountAmount = GetDependentDiscountAmount(results);
+
+            results.EmployeeDiscountAmount = GetLastNameDiscountAmount(results.EmployeeLastName, results.PromotionsList);
+
+            if (results.DependentsList != null)
+                results.DependentDiscountAmount = GetLastNameDiscountAmount(results.DependentsList.Select(x => x.LastName), results.PromotionsList);
+
+            results.CalculatedEmployeeDiscount = CalculateDiscountAmount(results.EmployeeCostOfBenefits, results.EmployeeDiscountAmount);
+            results.CalculatedDependentDiscount = CalculateDiscountAmount(results.DependentCostOfBenefits, results.DependentDiscountAmount);
+
             results.TotalDiscountAmount = GetTotalDiscountAmount(results);
             results.TotalAfterDiscount = GetTotalAfterDiscount(results);
 
@@ -39,6 +52,9 @@ namespace EmployeeBenefits.Business
         public decimal GetDependentCostBeforeDiscount(GetBenefitsDataResults data)
         {
             var value = 0M;
+
+            if (data.Dependent == null || !data.Dependent.Any())
+                return value;
 
             foreach (Dependent d in data.Dependent)
             {
@@ -55,30 +71,49 @@ namespace EmployeeBenefits.Business
             return value;
         }
 
-        public decimal GetEmployeeDiscountAmount(BenefitsSummary data)
+        public decimal CalculateDiscountAmount(decimal costOfBenefits, decimal discountAmount)
         {
             var value = 0M;
 
-            if (!data.EmployeeLastName.StartsWith(data.DiscountTrigger))
-                return value;
-
-            value = (data.EmployeeCostOfBenefits * data.DiscountAmount);
+            value = costOfBenefits * discountAmount;
 
             return value;
         }
-
-        public decimal GetDependentDiscountAmount(BenefitsSummary data)
+        
+        public decimal GetLastNameDiscountAmount(string lastName, List<Promotions> PromotionsList)
         {
             var value = 0M;
 
-            foreach (var d in data.DependentsList.Select(x => x.LastName))
+            if (PromotionsList == null || !PromotionsList.Any())
+                return value;
+
+            foreach (var promo in PromotionsList)
             {
-                if (d.StartsWith(data.DiscountTrigger))
+                if (lastName.StartsWith(promo.PromotionTrigger))
                 {
-                    value += (data.DependentCostOfBenefits * data.DiscountAmount);
+                    value += promo.DiscountAmount;
                 }
             }
+            return value;
+        }
 
+        public decimal GetLastNameDiscountAmount(IEnumerable<string> lastNames, List<Promotions> PromotionsList)
+        {
+            var value = 0M;
+
+            if (PromotionsList == null || !PromotionsList.Any())
+                return value;
+
+            foreach (var promo in PromotionsList)
+            {
+                foreach (var lastName in lastNames)
+                {
+                    if (lastName.StartsWith(promo.PromotionTrigger))
+                    {
+                        value += promo.DiscountAmount;
+                    }
+                }
+            }
             return value;
         }
 
@@ -86,7 +121,7 @@ namespace EmployeeBenefits.Business
         {
             var value = 0M;
 
-            value = (data.EmployeeDiscountAmount + data.DependentDiscountAmount);
+            value = (data.CalculatedEmployeeDiscount + data.CalculatedDependentDiscount);
 
             return value;
         }

@@ -57,6 +57,31 @@ namespace EmployeeBenefits.Tests.Business
 
             return benefitsData;
         }
+
+        protected GetBenefitsDataResults GetBenefitsDataWithoutDependents()
+        {
+            var benefitsData = new GetBenefitsDataResults();
+
+            benefitsData.Employee = new Employee { Id = 3, FirstName = "David", LastName = "Taylor", NumberOfPayPeriods = 52, Salary = 92000 };
+            benefitsData.Benefit = new Benefit { Id = 1, EmployeeCost = 1000, DependentCost = 500 };
+            benefitsData.Promotions = new List<Promotions> { new Promotions { Id = 1, PromotionName = "Name", PromotionTrigger = "A", DiscountAmount = 0.1M } };
+
+            return benefitsData;
+        }
+
+        protected GetBenefitsDataResults GetBenefitsDataWithoutPromotions()
+        {
+            var benefitsData = new GetBenefitsDataResults();
+
+            benefitsData.Employee = new Employee { Id = 3, FirstName = "David", LastName = "Taylor", NumberOfPayPeriods = 52, Salary = 92000 };
+            benefitsData.Dependent = new List<Dependent>
+            {
+                new Dependent { Id = 2, FirstName = "Jamie", LastName = "Taylor", Relationship = "Daughter", EmployeeId = 2 }
+            };
+            benefitsData.Benefit = new Benefit { Id = 1, EmployeeCost = 1000, DependentCost = 500 };
+
+            return benefitsData;
+        }
     }
 
     public class WhenBenefitsSummaryRunIsCalledWithDiscounts : BenefitsSummaryTests
@@ -99,13 +124,25 @@ namespace EmployeeBenefits.Tests.Business
         [Test]
         public void ItShouldReturnEmployeeDiscountAmount()
         {
-            results.EmployeeDiscountAmount.ShouldBeEquivalentTo(100);
+            results.EmployeeDiscountAmount.ShouldBeEquivalentTo(0.1M);
         }
 
         [Test]
         public void ItShouldReturnDependentDiscountAmount()
         {
-            results.DependentDiscountAmount.ShouldBeEquivalentTo(100);
+            results.DependentDiscountAmount.ShouldBeEquivalentTo(0.2M);
+        }
+
+        [Test]
+        public void ItShouldReturnCalculatedEmployeeDiscount()
+        {
+            results.CalculatedEmployeeDiscount.ShouldBeEquivalentTo(100);
+        }
+
+        [Test]
+        public void ItShouldReturnCalculatedDependentDiscount()
+        {
+            results.CalculatedDependentDiscount.ShouldBeEquivalentTo(100);
         }
 
         [Test]
@@ -138,6 +175,58 @@ namespace EmployeeBenefits.Tests.Business
         public void ItShouldReturnDependentDiscountOfZero()
         {
             results.EmployeeDiscountAmount.ShouldBeEquivalentTo(0);
+        }
+    }
+
+    public class WhenBenefitsSummaryRunIsCalledWithoutDependents : BenefitsSummaryTests
+    {
+        protected override void BecauseOf()
+        {
+            results = sut.Run(this.GetBenefitsDataWithoutDependents());
+        }
+
+        [Test]
+        public void ItShouldReturnDependentCostBeforeDiscountOfZero()
+        {
+            results.DependentCostBeforeDiscount.ShouldBeEquivalentTo(0);
+        }
+
+        [Test]
+        public void ItShouldReturnDependentDiscountOfZero()
+        {
+            results.DependentDiscountAmount.ShouldBeEquivalentTo(0);
+        }
+
+        [Test]
+        public void ItShouldReturnCalculatedDependentDiscountOfZero()
+        {
+            results.CalculatedDependentDiscount.ShouldBeEquivalentTo(0);
+        }
+    }
+
+    public class WhenBenefitsSummaryRunIsCalledWithoutPromotions : BenefitsSummaryTests
+    {
+        protected override void BecauseOf()
+        {
+            results = sut.Run(this.GetBenefitsDataWithoutPromotions());
+        }
+
+        [Test]
+        public void ItShouldReturnEmployeeDiscountAmountOfZero()
+        {
+            results.EmployeeDiscountAmount.ShouldBeEquivalentTo(0);
+        }
+
+        [Test]
+        public void ItShouldReturnDependentDiscountAmountOfZero()
+        {
+            results.DependentDiscountAmount.ShouldBeEquivalentTo(0);
+        }
+
+        [Test]
+        public void ItShouldReturnCalculatedDependentDiscountOfZero()
+        {
+            results.CalculatedDependentDiscount.ShouldBeEquivalentTo(0);
         }
     }
 }

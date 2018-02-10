@@ -19,10 +19,12 @@ namespace EmployeeBenefits.Business
         public decimal TotalCostBeforeDiscount { get; set; }
         public decimal EmployeeDiscountAmount { get; set; }
         public decimal DependentDiscountAmount { get; set; }
+        public decimal CalculatedEmployeeDiscount { get; set; }
+        public decimal CalculatedDependentDiscount { get; set; }
         public decimal TotalAfterDiscount { get; set; }
         public decimal TotalDiscountAmount { get; set; }
         public decimal BiWeeklyCost { get; set; }
-        public List<Dependent> DependentsList { get; set; }
+        public List<Dependent> DependentsList { get; set; } 
         public List<Promotions> PromotionsList { get; set; }
     }
 }

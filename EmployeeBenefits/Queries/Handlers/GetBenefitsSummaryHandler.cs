@@ -1,10 +1,6 @@
 ﻿using EmployeeBenefits.Business;
 using EmployeeBenefits.Queries.Messages;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace EmployeeBenefits.Queries.Handlers
 {
@@ -30,7 +26,7 @@ namespace EmployeeBenefits.Queries.Handlers
 
             var summary = _summarizeBenefits.Run(data);
 
-            return new BenefitsSummary();
+            return summary;
         }
     }
 }
