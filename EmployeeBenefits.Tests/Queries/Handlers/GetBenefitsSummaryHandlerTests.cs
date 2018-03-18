@@ -34,6 +34,8 @@ namespace EmployeeBenefits.Tests.Queries.Handlers
 
             A.CallTo(() => mediator.Send(A<GetBenefitsSummary>.Ignored, A<CancellationToken>.Ignored)).Returns(GetBenefitsSummary());
 
+            A.CallTo(() => summarizeBenefits.Run(A<GetBenefitsDataResults>.Ignored)).Returns(GetBenefitsSummary());
+
             sut = new GetBenefitsSummaryHandler(mediator, summarizeBenefits);
         }
 
@@ -42,7 +44,10 @@ namespace EmployeeBenefits.Tests.Queries.Handlers
             var data = Builder<BenefitsSummary>.CreateNew().Build();
             return data;
         }
-            
+    }
+
+    public class WhenGetBenefitsSummaryHandlerIsCalledWithEmployee : GetBenefitsSummaryHandlerTests
+    {
 
         protected override void BecauseOf()
         {
@@ -50,10 +55,7 @@ namespace EmployeeBenefits.Tests.Queries.Handlers
 
             results = sut.Handle(message);
         }
-    }
 
-    public class WhenGetBenefitsSummaryHandlerIsCalledWithEmployee : GetBenefitsSummaryHandlerTests
-    {
         [Test]
         public void ItShouldReturnCorrectType()
         {
