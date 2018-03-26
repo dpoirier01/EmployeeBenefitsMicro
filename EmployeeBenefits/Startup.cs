@@ -63,6 +63,7 @@ namespace EmployeeBenefits
             services.AddScoped<IBenefitsContext>(provider => provider.GetService<BenefitsContext>());
             
             services.AddTransient<ISummarizeBenefits, SummarizeBenefits>();
+            services.AddTransient<IDeterminePromotions, DeterminePromotions>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

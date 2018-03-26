@@ -6,5 +6,6 @@
         public string PromotionName { get; set; }
         public string PromotionTrigger { get; set; }
         public decimal DiscountAmount { get; set; }
+        public string DiscountType { get; set; }
     }
 }

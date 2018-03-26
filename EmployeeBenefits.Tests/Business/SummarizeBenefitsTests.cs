@@ -8,21 +8,26 @@ using EmployeeBenefits.Business;
 using System.Linq;
 using EmployeeBenefits.Data.Entities;
 using System.Collections.Generic;
+using System.Threading;
+using FizzWare.NBuilder;
+using EmployeeBenefits.Business.Discounts;
 
 namespace EmployeeBenefits.Tests.Business
 {
     [TestFixture]
-    public class BenefitsSummaryTests : ContextSpecification
+    public class SummarizeBenefitsTests : ContextSpecification
     {
         protected SummarizeBenefits sut;
         protected BenefitsSummary results;
+        protected IDeterminePromotions determinePromotions;
 
         protected override void Context()
         {
             base.Context();
-            
 
-            sut = new SummarizeBenefits();
+            determinePromotions = A.Fake<IDeterminePromotions>();
+
+            sut = new SummarizeBenefits(determinePromotions);
         }
 
         protected GetBenefitsDataResults GetBenefitsDataWithEmployeeDiscount()
@@ -82,9 +87,19 @@ namespace EmployeeBenefits.Tests.Business
 
             return benefitsData;
         }
+
+        protected List<PromotionTypes> GetPromotions()
+        {
+            var lPromotionType = new List<PromotionTypes>();
+            var promoType = new PromotionTypes();
+            promoType.LetterPromo = new Letter();
+            promoType.numberOfDependentsPromo = new NumberOfDependents();
+            lPromotionType.Add(promoType);
+            return lPromotionType;
+        }
     }
 
-    public class WhenBenefitsSummaryRunIsCalledWithDiscounts : BenefitsSummaryTests
+    public class WhenSummarizeBenefitsRunIsCalled : SummarizeBenefitsTests
     {
         protected override void BecauseOf()
         {
@@ -95,6 +110,22 @@ namespace EmployeeBenefits.Tests.Business
         public void ItShouldReturnBenefitsSummary()
         {
             results.Should().BeOfType<BenefitsSummary>();
+        }
+
+        [Test]
+        public void ItShouldCallDeterminePromotion()
+        {
+            A.CallTo(() => determinePromotions.Run(A<List<Promotions>>.Ignored)).MustHaveHappened();
+        }
+    }
+
+    public class WhenBenefitsSummaryRunIsCalledWithDiscounts : SummarizeBenefitsTests
+    {
+        protected override void BecauseOf()
+        {
+            A.CallTo(() => determinePromotions.Run(A<List<Promotions>>.Ignored)).Returns(GetPromotions());
+
+            results = sut.Run(this.GetBenefitsDataWithEmployeeDiscount());
         }
 
         [Test]
@@ -119,12 +150,6 @@ namespace EmployeeBenefits.Tests.Business
         public void ItShouldReturnTotalBeforeDiscount()
         {
             results.TotalCostBeforeDiscount.ShouldBeEquivalentTo(2500);
-        }
-
-        [Test]
-        public void ItShouldReturnEmployeeDiscountAmount()
-        {
-            results.EmployeeDiscountAmount.ShouldBeEquivalentTo(0.1M);
         }
 
         [Test]
@@ -158,7 +183,7 @@ namespace EmployeeBenefits.Tests.Business
         }
     }
 
-    public class WhenBenefitsSummaryRunIsCalledWithoutDiscounts : BenefitsSummaryTests
+    public class WhenBenefitsSummaryRunIsCalledWithoutDiscounts : SummarizeBenefitsTests
     {
         protected override void BecauseOf()
         {
@@ -178,7 +203,7 @@ namespace EmployeeBenefits.Tests.Business
         }
     }
 
-    public class WhenBenefitsSummaryRunIsCalledWithoutDependents : BenefitsSummaryTests
+    public class WhenBenefitsSummaryRunIsCalledWithoutDependents : SummarizeBenefitsTests
     {
         protected override void BecauseOf()
         {
@@ -204,7 +229,7 @@ namespace EmployeeBenefits.Tests.Business
         }
     }
 
-    public class WhenBenefitsSummaryRunIsCalledWithoutPromotions : BenefitsSummaryTests
+    public class WhenBenefitsSummaryRunIsCalledWithoutPromotions : SummarizeBenefitsTests
     {
         protected override void BecauseOf()
         {

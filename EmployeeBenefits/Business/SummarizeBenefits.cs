@@ -5,8 +5,15 @@ using System.Linq;
 
 namespace EmployeeBenefits.Business
 {
-    public class SummarizeBenefits : ISummarizeBenefits 
+    public class SummarizeBenefits : ISummarizeBenefits
     {
+        private readonly IDeterminePromotions _determinePromotions;
+
+        public SummarizeBenefits(IDeterminePromotions determinePromotions)
+        {
+            _determinePromotions = determinePromotions;
+        }
+
         public BenefitsSummary Run(GetBenefitsDataResults data)
         {
             var results = new BenefitsSummary()
@@ -17,11 +24,18 @@ namespace EmployeeBenefits.Business
                 DependentsList = data.Dependent,
                 PromotionsList = data.Promotions,
                 DependentCostOfBenefits = data.Benefit.DependentCost,
-                EmployeeFullName = data.Employee.FirstName + " " + data.Employee.LastName
+                EmployeeFullName = data.Employee.FirstName + " " + data.Employee.LastName,
+                DiscountAmount = data.Promotions.Select(x => x.DiscountAmount).FirstOrDefault()
             };
 
             if (data.Promotions != null)
                 results.DiscountTrigger = data.Promotions.Select(x => x.PromotionTrigger).FirstOrDefault();
+
+            var currentPromotions = _determinePromotions.Run(results.PromotionsList);
+           
+            results.EmployeeDiscountAmount = currentPromotions.Select(x => x.LetterPromo.GetDiscount(results.EmployeeLastName, results.DiscountTrigger, results.DiscountAmount)).FirstOrDefault();
+
+
 
             if (data.Promotions != null)
                 results.DiscountAmount = data.Promotions.Select(x => x.DiscountAmount).FirstOrDefault();
@@ -30,7 +44,7 @@ namespace EmployeeBenefits.Business
             results.DependentCostBeforeDiscount = GetDependentCostBeforeDiscount(data);
             results.TotalCostBeforeDiscount = GetTotalBeforeDiscount(results);
 
-            results.EmployeeDiscountAmount = GetLastNameDiscountAmount(results.EmployeeLastName, results.PromotionsList);
+            //results.EmployeeDiscountAmount = GetLastNameDiscountAmount(results.EmployeeLastName, results.PromotionsList);
 
             if (results.DependentsList != null)
                 results.DependentDiscountAmount = GetLastNameDiscountAmount(results.DependentsList.Select(x => x.LastName), results.PromotionsList);
